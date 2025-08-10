@@ -5,9 +5,16 @@ const isDev = process.env.NODE_ENV === 'development';
 // 导入后端服务器
 const createServer = require('./server/app');
 
+// 导入新功能模块
+const WindowDetector = require('./window-detector');
+const FloatingPanel = require('./floating-panel');
+
 let mainWindow;
 let tray;
 let server;
+let windowDetector;
+let floatingPanel;
+let commandsCache = [];
 
 // 创建主窗口
 function createWindow() {
@@ -187,12 +194,69 @@ async function startServer() {
   }
 }
 
+// 初始化智能功能
+function initializeSmartFeatures() {
+  // 创建窗口检测器
+  windowDetector = new WindowDetector();
+
+  // 创建悬浮面板
+  floatingPanel = new FloatingPanel();
+
+  // 监听终端激活事件
+  windowDetector.on('terminalActivated', async (window) => {
+    console.log(`🎯 终端激活: ${window.owner.name}`);
+    // 可以在这里添加自动显示逻辑
+    // 暂时不自动显示，避免打扰用户
+  });
+
+  windowDetector.on('terminalDeactivated', (window) => {
+    console.log('📱 终端失去焦点');
+    // 隐藏悬浮面板
+    if (floatingPanel.isVisible) {
+      floatingPanel.hide();
+    }
+  });
+
+  // 开始监控
+  windowDetector.startMonitoring();
+
+  console.log('🚀 智能功能已初始化');
+}
+
+// 加载命令数据
+async function loadCommands() {
+  try {
+    const response = await fetch('http://localhost:9091/api/commands');
+    if (response.ok) {
+      commandsCache = await response.json();
+      console.log(`📚 已加载 ${commandsCache.length} 个命令`);
+    }
+  } catch (error) {
+    console.error('❌ 加载命令失败:', error.message);
+    commandsCache = [];
+  }
+}
+
+// 刷新命令缓存
+async function refreshCommandsCache() {
+  await loadCommands();
+  console.log('🔄 命令缓存已刷新');
+}
+
 // 应用准备就绪
 app.whenReady().then(async () => {
   await startServer();
   createWindow();
   createTray();
   createMenu();
+
+  // 初始化智能功能
+  initializeSmartFeatures();
+
+  // 延迟加载命令数据，等服务器完全启动
+  setTimeout(async () => {
+    await loadCommands();
+  }, 1000);
 
   // 注册全局快捷键
   globalShortcut.register('CommandOrControl+Shift+C', () => {
@@ -201,6 +265,30 @@ app.whenReady().then(async () => {
     } else {
       mainWindow.show();
       mainWindow.focus();
+    }
+  });
+
+  // 注册悬浮面板快捷键
+  globalShortcut.register('CommandOrControl+Shift+Space', async () => {
+    console.log('🎯 快捷键触发悬浮面板');
+
+    // 刷新命令缓存
+    await refreshCommandsCache();
+
+    // 显示悬浮面板
+    floatingPanel.toggle(commandsCache);
+  });
+
+  // 注册智能检测快捷键（仅在终端激活时有效）
+  globalShortcut.register('CommandOrControl+Shift+K', async () => {
+    const terminalStatus = windowDetector.getTerminalStatus();
+
+    if (terminalStatus.isActive) {
+      console.log('🎯 终端智能面板触发');
+      await refreshCommandsCache();
+      floatingPanel.show(commandsCache);
+    } else {
+      console.log('⚠️ 当前不在终端环境，快捷键无效');
     }
   });
 
@@ -224,6 +312,16 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
   app.isQuiting = true;
   globalShortcut.unregisterAll();
+
+  // 清理智能功能
+  if (windowDetector) {
+    windowDetector.stopMonitoring();
+  }
+
+  if (floatingPanel) {
+    floatingPanel.destroy();
+  }
+
   if (server) {
     server.close();
   }
@@ -242,3 +340,53 @@ ipcMain.handle('show-window', () => {
 ipcMain.handle('hide-window', () => {
   mainWindow.hide();
 });
+
+// 悬浮面板相关IPC
+ipcMain.on('command-selected', (event, command) => {
+  console.log(`📋 用户选择命令: ${command.name}`);
+
+  if (floatingPanel) {
+    floatingPanel.selectCommand(command);
+  }
+
+  // 更新命令使用统计
+  updateCommandUsage(command.id);
+});
+
+ipcMain.on('hide-panel', () => {
+  if (floatingPanel) {
+    floatingPanel.hide();
+  }
+});
+
+// 智能功能相关IPC
+ipcMain.handle('get-terminal-status', () => {
+  if (windowDetector) {
+    return windowDetector.getTerminalStatus();
+  }
+  return { isActive: false, window: null };
+});
+
+ipcMain.handle('show-floating-panel', async () => {
+  await refreshCommandsCache();
+  if (floatingPanel) {
+    floatingPanel.show(commandsCache);
+  }
+});
+
+ipcMain.handle('refresh-commands', async () => {
+  await refreshCommandsCache();
+  return commandsCache;
+});
+
+// 更新命令使用统计
+async function updateCommandUsage(commandId) {
+  try {
+    await fetch(`http://localhost:9091/api/commands/${commandId}/use`, {
+      method: 'POST'
+    });
+    console.log(`📊 更新命令使用统计: ${commandId}`);
+  } catch (error) {
+    console.error('❌ 更新使用统计失败:', error.message);
+  }
+}

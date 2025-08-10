@@ -352,4 +352,80 @@ router.post('/:id/use', (req, res) => {
   }
 });
 
+// 获取最常用命令
+router.get('/most-used', (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    const db = req.app.locals.db;
+
+    const query = `
+      SELECT c.*, cat.name as category_name, cat.color as category_color
+      FROM commands c
+      LEFT JOIN categories cat ON c.category_id = cat.id
+      WHERE c.usage_count > 0
+      ORDER BY c.usage_count DESC, c.updated_at DESC
+      LIMIT ?
+    `;
+
+    db.all(query, [parseInt(limit)], (err, commands) => {
+      if (err) {
+        console.error('获取最常用命令失败:', err);
+        return res.status(500).json({
+          success: false,
+          error: '获取最常用命令失败'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: commands
+      });
+    });
+  } catch (error) {
+    console.error('获取最常用命令失败:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取最常用命令失败'
+    });
+  }
+});
+
+// 获取最近使用命令
+router.get('/recent', (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    const db = req.app.locals.db;
+
+    const query = `
+      SELECT c.*, cat.name as category_name, cat.color as category_color
+      FROM commands c
+      LEFT JOIN categories cat ON c.category_id = cat.id
+      WHERE c.usage_count > 0
+      ORDER BY c.updated_at DESC
+      LIMIT ?
+    `;
+
+    db.all(query, [parseInt(limit)], (err, commands) => {
+      if (err) {
+        console.error('获取最近使用命令失败:', err);
+        return res.status(500).json({
+          success: false,
+          error: '获取最近使用命令失败'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: commands
+      });
+    });
+  } catch (error) {
+    console.error('获取最近使用命令失败:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取最近使用命令失败'
+    });
+  }
+});
+
 module.exports = router;

@@ -77,7 +77,6 @@ dist
 
 # Gatsby files
 .cache/
-public
 
 # Storybook build outputs
 .out
@@ -116,7 +115,6 @@ app/
 *.AppImage
 
 # Electron binaries and large files
-electron/node_modules/
 **/node_modules/electron/
 **/Electron.app/
 **/electron.exe
@@ -126,12 +124,14 @@ electron/node_modules/
 **/*.so
 **/*.dylib
 
-# Database files
+# Database files (keep structure, ignore actual data)
 *.db
 *.sqlite
 *.sqlite3
-electron/data/
-electron/server/data/
+electron/data/*.db
+electron/data/*.sqlite
+electron/server/data/*.db
+electron/server/data/*.sqlite
 
 # Build artifacts
 *.o

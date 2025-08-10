@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命令管理工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .categories {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .category-item:hover {
+            background: #f3f4f6;
+        }
+
+        .category-item.active {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .category-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .category-count {
+            margin-left: auto;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .add-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .add-button:hover {
+            background: #2563eb;
+        }
+
+        .commands-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: #f9fafb;
+        }
+
+        .command-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .command-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .command-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .command-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .command-category {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .command-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-button {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-button:hover {
+            background: #f3f4f6;
+        }
+
+        .action-button.primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .action-button.primary:hover {
+            background: #2563eb;
+        }
+
+        .action-button.favorite {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+        .action-button.favorite:hover {
+            background: #fee2e2;
+        }
+
+        .command-code {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            color: #374151;
+            margin: 12px 0;
+            word-break: break-all;
+        }
+
+        .command-description {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .command-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .button.secondary {
+            background: white;
+            color: #374151;
+        }
+
+        .button.secondary:hover {
+            background: #f3f4f6;
+        }
+
+        .button.primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .button.primary:hover {
+            background: #2563eb;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #374151;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">⚡</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 16px;">命令管理</div>
+                        <div style="font-size: 12px; color: #6b7280;">快速命令工具</div>
+                    </div>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="搜索命令..." id="searchInput">
+                    <div class="search-icon">🔍</div>
+                </div>
+            </div>
+
+            <div class="categories" id="categoriesList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <!-- 统计面板 -->
+            <div style="padding: 20px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+                <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">📊 统计信息</div>
+                <div id="statsPanel" style="font-size: 11px; color: #9ca3af; line-height: 1.4;">
+                    <div>总命令: <span id="totalCommands">0</span></div>
+                    <div>收藏: <span id="favoriteCommands">0</span></div>
+                    <div>今日使用: <span id="todayUsage">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title">命令列表</h1>
+                <div style="display: flex; gap: 12px;">
+                    <button class="add-button" style="background: #10b981;" onclick="exportData()" title="导出数据">📤 导出</button>
+                    <button class="add-button" style="background: #f59e0b;" onclick="document.getElementById('importFile').click()" title="导入数据">📥 导入</button>
+                    <button class="add-button" onclick="showAddModal()">+ 新建命令</button>
+                </div>
+            </div>
+
+            <!-- 隐藏的文件输入 -->
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+
+            <div class="commands-container" id="commandsList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加分类模态框 -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">新建分类</h2>
+                <button class="close-button" onclick="hideCategoryModal()">&times;</button>
+            </div>
+
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label class="form-label">分类名称 *</label>
+                    <input type="text" class="form-input" id="categoryName" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">分类描述</label>
+                    <textarea class="form-input form-textarea" id="categoryDescription"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">分类颜色</label>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                        <div class="color-option" data-color="#3b82f6" style="background: #3b82f6;"></div>
+                        <div class="color-option" data-color="#ef4444" style="background: #ef4444;"></div>
+                        <div class="color-option" data-color="#10b981" style="background: #10b981;"></div>
+                        <div class="color-option" data-color="#f59e0b" style="background: #f59e0b;"></div>
+                        <div class="color-option" data-color="#8b5cf6" style="background: #8b5cf6;"></div>
+                        <div class="color-option" data-color="#ec4899" style="background: #ec4899;"></div>
+                        <div class="color-option" data-color="#06b6d4" style="background: #06b6d4;"></div>
+                        <div class="color-option" data-color="#84cc16" style="background: #84cc16;"></div>
+                    </div>
+                    <input type="hidden" id="categoryColor" value="#3b82f6">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="button secondary" onclick="hideCategoryModal()">取消</button>
+                    <button type="submit" class="button primary">创建分类</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加/编辑命令模态框 -->
+    <div class="modal" id="commandModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">新建命令</h2>
+                <button class="close-button" onclick="hideModal()">&times;</button>
+            </div>
+
+            <form id="commandForm">
+                <div class="form-group">
+                    <label class="form-label">命令名称 *</label>
+                    <input type="text" class="form-input" id="commandName" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">命令内容 *</label>
+                    <textarea class="form-input form-textarea" id="commandCode" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">描述</label>
+                    <textarea class="form-input form-textarea" id="commandDescription"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">分类</label>
+                    <select class="form-input" id="commandCategory">
+                        <option value="">选择分类</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <input type="text" class="form-input" id="commandTags" placeholder="用逗号分隔多个标签">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="button secondary" onclick="hideModal()">取消</button>
+                    <button type="submit" class="button primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 全局变量
+        let commands = [];
+        let categories = [];
+        let currentCategory = null;
+        let searchTerm = '';
+        let editingCommand = null;
+        let showFavorites = false;
+        let showRecent = false;
+
+        // API 基础URL
+        const API_BASE = 'http://localhost:9091/api';
+
+        // 初始化应用
+        async function init() {
+            await loadCategories();
+            await loadCommands();
+        }
+
+        // 加载分类
+        async function loadCategories() {
+            try {
+                const response = await fetch(`${API_BASE}/categories`);
+                const data = await response.json();
+                if (data.success) {
+                    categories = data.data;
+                    renderCategories();
+                    updateCategorySelect();
+                }
+            } catch (error) {
+                showToast('加载分类失败', 'error');
+            }
+        }
+
+        // 加载命令
+        async function loadCommands() {
+            try {
+                let url = `${API_BASE}/commands`;
+                const params = new URLSearchParams();
+
+                if (currentCategory) {
+                    params.append('category_id', currentCategory);
+                }
+                if (searchTerm) {
+                    params.append('search', searchTerm);
+                }
+                if (showFavorites) {
+                    params.append('favorite', 'true');
+                }
+
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.success) {
+                    commands = data.data;
+
+                    // 如果是最近常用过滤，使用本地过滤
+                    if (showRecent) {
+                        commands = getRecentCommands();
+                    }
+
+                    renderCommands();
+                }
+            } catch (error) {
+                showToast('加载命令失败', 'error');
+            }
+        }
+
+        // 渲染分类列表
+        function renderCategories() {
+            const container = document.getElementById('categoriesList');
+
+            let html = `
+                <div class="category-item ${!currentCategory && !showFavorites && !showRecent ? 'active' : ''}" onclick="selectCategory(null)">
+                    <div class="category-color" style="background: #6b7280;"></div>
+                    <span>全部命令</span>
+                    <span class="category-count">${commands.length}</span>
+                </div>
+                <div class="category-item ${showRecent ? 'active' : ''}" onclick="toggleRecentFilter()">
+                    <div class="category-color" style="background: #3b82f6;">🕒</div>
+                    <span>最近常用</span>
+                    <span class="category-count">${getRecentCommands().length}</span>
+                </div>
+                <div class="category-item ${showFavorites ? 'active' : ''}" onclick="toggleFavoriteFilter()">
+                    <div class="category-color" style="background: #ef4444;">❤️</div>
+                    <span>收藏的命令</span>
+                    <span class="category-count">${commands.filter(cmd => cmd.is_favorite).length}</span>
+                </div>
+            `;
+
+            categories.forEach(category => {
+                html += `
+                    <div class="category-item ${currentCategory === category.id ? 'active' : ''}" onclick="selectCategory(${category.id})">
+                        <div class="category-color" style="background: ${category.color};"></div>
+                        <span>${category.name}</span>
+                        <span class="category-count">${category.command_count}</span>
+                    </div>
+                `;
+            });
+
+            // 添加创建分类按钮
+            html += `
+                <div class="category-item" onclick="showAddCategoryModal()" style="border: 1px dashed #d1d5db; margin-top: 8px;">
+                    <div class="category-color" style="background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af;">+</div>
+                    <span style="color: #6b7280;">新建分类</span>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // 渲染命令列表
+        function renderCommands() {
+            const container = document.getElementById('commandsList');
+
+            if (commands.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>还没有命令</h3>
+                        <p>点击"新建命令"按钮创建您的第一个命令</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            commands.forEach(command => {
+                html += `
+                    <div class="command-card">
+                        <div class="command-header">
+                            <div>
+                                <div class="command-name">${command.name}</div>
+                                ${command.category_name ? `
+                                    <div class="command-category">
+                                        <div class="category-color" style="background: ${command.category_color};"></div>
+                                        ${command.category_name}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="command-actions">
+                                <button class="action-button ${command.is_favorite ? 'favorite' : ''}" onclick="toggleFavorite(${command.id})" title="${command.is_favorite ? '取消收藏' : '添加收藏'}">
+                                    ${command.is_favorite ? '❤️' : '🤍'}
+                                </button>
+                                <button class="action-button primary" onclick="copyCommand('${command.command.replace(/'/g, "\\'")}', ${command.id})">复制</button>
+                                <button class="action-button" onclick="editCommand(${command.id})">编辑</button>
+                                <button class="action-button" onclick="deleteCommand(${command.id})">删除</button>
+                            </div>
+                        </div>
+
+                        <div class="command-code">${command.command}</div>
+
+                        ${command.description ? `<div class="command-description">${command.description}</div>` : ''}
+
+                        <div class="command-meta">
+                            <span>使用 ${command.usage_count} 次</span>
+                            <span>最后使用: ${command.last_used ? new Date(command.last_used).toLocaleString() : '从未使用'}</span>
+                            <span>创建于: ${new Date(command.created_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            updateStats();
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            const totalCommands = commands.length;
+            const favoriteCommands = commands.filter(cmd => cmd.is_favorite).length;
+            const today = new Date().toDateString();
+            const todayUsage = commands.reduce((total, cmd) => {
+                const lastUsed = cmd.last_used ? new Date(cmd.last_used).toDateString() : null;
+                return total + (lastUsed === today ? 1 : 0);
+            }, 0);
+
+            document.getElementById('totalCommands').textContent = totalCommands;
+            document.getElementById('favoriteCommands').textContent = favoriteCommands;
+            document.getElementById('todayUsage').textContent = todayUsage;
+        }
+
+        // 更新分类选择框
+        function updateCategorySelect() {
+            const select = document.getElementById('commandCategory');
+            let html = '<option value="">选择分类</option>';
+
+            categories.forEach(category => {
+                html += `<option value="${category.id}">${category.name}</option>`;
+            });
+
+            select.innerHTML = html;
+        }
+
+        // 选择分类
+        function selectCategory(categoryId) {
+            currentCategory = categoryId;
+            showFavorites = false;
+            showRecent = false;
+            loadCommands();
+            renderCategories();
+        }
+
+        // 切换收藏过滤
+        function toggleFavoriteFilter() {
+            showFavorites = !showFavorites;
+            showRecent = false;
+            currentCategory = null;
+            loadCommands();
+            renderCategories();
+        }
+
+        // 切换最近常用过滤
+        function toggleRecentFilter() {
+            showRecent = !showRecent;
+            showFavorites = false;
+            currentCategory = null;
+            loadCommands();
+            renderCategories();
+        }
+
+        // 获取最近常用命令（按使用次数和最后使用时间排序）
+        function getRecentCommands() {
+            const now = new Date();
+            const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+            return commands
+                .filter(cmd => cmd.usage_count > 0) // 至少使用过一次
+                .sort((a, b) => {
+                    // 优先按使用次数排序，然后按最后使用时间
+                    if (b.usage_count !== a.usage_count) {
+                        return b.usage_count - a.usage_count;
+                    }
+                    const aTime = a.last_used ? new Date(a.last_used) : new Date(a.updated_at);
+                    const bTime = b.last_used ? new Date(b.last_used) : new Date(b.updated_at);
+                    return bTime - aTime;
+                })
+                .slice(0, 10); // 只显示前10个
+        }
+
+        // 切换收藏状态
+        async function toggleFavorite(commandId) {
+            try {
+                const command = commands.find(c => c.id === commandId);
+                if (!command) return;
+
+                const response = await fetch(`${API_BASE}/commands/${commandId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_favorite: !command.is_favorite })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast(command.is_favorite ? '已取消收藏' : '已添加到收藏', 'success');
+                    loadCommands();
+                    loadCategories();
+                } else {
+                    showToast('操作失败', 'error');
+                }
+            } catch (error) {
+                showToast('操作失败', 'error');
+            }
+        }
+
+        // 搜索命令
+        function searchCommands() {
+            searchTerm = document.getElementById('searchInput').value;
+            loadCommands();
+        }
+
+        // 复制命令
+        async function copyCommand(command, commandId) {
+            try {
+                await navigator.clipboard.writeText(command);
+                showToast('命令已复制到剪贴板', 'success');
+
+                // 增加使用次数
+                await fetch(`${API_BASE}/commands/${commandId}/use`, { method: 'POST' });
+                loadCommands();
+            } catch (error) {
+                showToast('复制失败', 'error');
+            }
+        }
+
+        // 显示添加分类模态框
+        function showAddCategoryModal() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryColor').value = '#3b82f6';
+            // 重置颜色选择
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector('.color-option[data-color="#3b82f6"]').classList.add('selected');
+            document.getElementById('categoryModal').classList.add('show');
+        }
+
+        // 隐藏分类模态框
+        function hideCategoryModal() {
+            document.getElementById('categoryModal').classList.remove('show');
+        }
+
+        // 显示添加模态框
+        function showAddModal() {
+            editingCommand = null;
+            document.getElementById('modalTitle').textContent = '新建命令';
+            document.getElementById('commandForm').reset();
+            document.getElementById('commandModal').classList.add('show');
+        }
+
+        // 编辑命令
+        function editCommand(commandId) {
+            const command = commands.find(c => c.id === commandId);
+            if (!command) return;
+
+            editingCommand = command;
+            document.getElementById('modalTitle').textContent = '编辑命令';
+            document.getElementById('commandName').value = command.name;
+            document.getElementById('commandCode').value = command.command;
+            document.getElementById('commandDescription').value = command.description || '';
+            document.getElementById('commandCategory').value = command.category_id || '';
+            document.getElementById('commandTags').value = command.tags || '';
+            document.getElementById('commandModal').classList.add('show');
+        }
+
+        // 删除命令
+        async function deleteCommand(commandId) {
+            if (!confirm('确定要删除这个命令吗？')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/commands/${commandId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('命令删除成功', 'success');
+                    loadCommands();
+                    loadCategories();
+                } else {
+                    showToast('删除失败', 'error');
+                }
+            } catch (error) {
+                showToast('删除失败', 'error');
+            }
+        }
+
+        // 隐藏模态框
+        function hideModal() {
+            document.getElementById('commandModal').classList.remove('show');
+        }
+
+        // 保存命令
+        async function saveCommand(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('commandName').value,
+                command: document.getElementById('commandCode').value,
+                description: document.getElementById('commandDescription').value,
+                category_id: document.getElementById('commandCategory').value || null,
+                tags: document.getElementById('commandTags').value
+            };
+
+            try {
+                let response;
+                if (editingCommand) {
+                    response = await fetch(`${API_BASE}/commands/${editingCommand.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    response = await fetch(`${API_BASE}/commands`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast(editingCommand ? '命令更新成功' : '命令创建成功', 'success');
+                    hideModal();
+                    loadCommands();
+                    loadCategories();
+                } else {
+                    showToast('保存失败', 'error');
+                }
+            } catch (error) {
+                showToast('保存失败', 'error');
+            }
+        }
+
+        // 导出数据
+        async function exportData() {
+            try {
+                const [commandsData, categoriesData] = await Promise.all([
+                    fetch(`${API_BASE}/commands`).then(r => r.json()),
+                    fetch(`${API_BASE}/categories`).then(r => r.json())
+                ]);
+
+                const exportData = {
+                    commands: commandsData.data || [],
+                    categories: categoriesData.data || [],
+                    exportDate: new Date().toISOString(),
+                    version: '1.0.0'
+                };
+
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `commands-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showToast('数据导出成功', 'success');
+            } catch (error) {
+                showToast('导出失败', 'error');
+            }
+        }
+
+        // 导入数据
+        async function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+
+                if (!data.commands || !data.categories) {
+                    showToast('无效的数据格式', 'error');
+                    return;
+                }
+
+                let importedCommands = 0;
+                let importedCategories = 0;
+
+                // 导入分类
+                for (const category of data.categories) {
+                    try {
+                        await fetch(`${API_BASE}/categories`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                name: category.name,
+                                description: category.description,
+                                color: category.color
+                            })
+                        });
+                        importedCategories++;
+                    } catch (error) {
+                        console.warn('导入分类失败:', category.name);
+                    }
+                }
+
+                // 导入命令
+                for (const command of data.commands) {
+                    try {
+                        await fetch(`${API_BASE}/commands`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                name: command.name,
+                                command: command.command,
+                                description: command.description,
+                                category_id: command.category_id,
+                                tags: command.tags,
+                                is_favorite: command.is_favorite || false
+                            })
+                        });
+                        importedCommands++;
+                    } catch (error) {
+                        console.warn('导入命令失败:', command.name);
+                    }
+                }
+
+                showToast(`导入成功：${importedCommands} 个命令，${importedCategories} 个分类`, 'success');
+                loadCommands();
+                loadCategories();
+            } catch (error) {
+                showToast('导入失败：' + error.message, 'error');
+            }
+
+            // 重置文件输入
+            event.target.value = '';
+        }
+
+        // 显示提示
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type} show`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // 快捷键支持
+        document.addEventListener('keydown', function(event) {
+            // Cmd/Ctrl + N: 新建命令
+            if ((event.metaKey || event.ctrlKey) && event.key === 'n') {
+                event.preventDefault();
+                showAddModal();
+            }
+
+            // Cmd/Ctrl + F: 聚焦搜索框
+            if ((event.metaKey || event.ctrlKey) && event.key === 'f') {
+                event.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+
+            // Escape: 关闭模态框
+            if (event.key === 'Escape') {
+                hideModal();
+            }
+
+            // Cmd/Ctrl + 1-5: 快速切换分类
+            if ((event.metaKey || event.ctrlKey) && event.key >= '1' && event.key <= '5') {
+                event.preventDefault();
+                const categoryIndex = parseInt(event.key) - 1;
+                if (categoryIndex === 0) {
+                    selectCategory(null);
+                } else if (categories[categoryIndex - 1]) {
+                    selectCategory(categories[categoryIndex - 1].id);
+                }
+            }
+        });
+
+        // 保存分类
+        async function saveCategory(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('categoryName').value,
+                description: document.getElementById('categoryDescription').value,
+                color: document.getElementById('categoryColor').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/categories`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('分类创建成功', 'success');
+                    hideCategoryModal();
+                    loadCategories();
+                } else {
+                    showToast('创建失败: ' + (data.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                showToast('创建失败', 'error');
+            }
+        }
+
+        // 事件监听
+        document.getElementById('searchInput').addEventListener('input', searchCommands);
+        document.getElementById('commandForm').addEventListener('submit', saveCommand);
+        document.getElementById('categoryForm').addEventListener('submit', saveCategory);
+
+        // 颜色选择器事件
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('color-option')) {
+                // 移除所有选中状态
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                // 添加选中状态
+                event.target.classList.add('selected');
+                // 设置颜色值
+                document.getElementById('categoryColor').value = event.target.dataset.color;
+            }
+        });
+
+        // 初始化应用
+        init();
+    </script>
+</body>
+</html>

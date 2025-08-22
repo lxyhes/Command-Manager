@@ -495,6 +495,23 @@
                     <div>今日使用: <span id="todayUsage">0</span></div>
                 </div>
             </div>
+
+            <!-- 使用指南按钮 -->
+            <div style="padding: 16px 20px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+                <button onclick="showHelpModal()" style="
+                    width: 100%;
+                    padding: 10px;
+                    background: #f3f4f6;
+                    border: 1px solid #d1d5db;
+                    border-radius: 8px;
+                    color: #374151;
+                    font-size: 12px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                ">
+                    📖 使用指南
+                </button>
+            </div>
         </div>
 
         <!-- 主内容区 -->
@@ -514,6 +531,65 @@
             <div class="commands-container" id="commandsList">
                 <div class="loading">
                     <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用指南模态框 -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="modal-title">📖 使用指南</h2>
+                <button class="close-button" onclick="hideHelpModal()">&times;</button>
+            </div>
+
+            <div style="padding: 0 20px 20px; max-height: 60vh; overflow-y: auto;">
+                <h3 style="margin-bottom: 16px; color: #111827;">快速开始</h3>
+                
+                <div style="margin-bottom: 24px;">
+                    <h4 style="margin-bottom: 8px; color: #374151;">🎯 核心功能</h4>
+                    <ul style="color: #6b7280; line-height: 1.6; margin-left: 16px;">
+                        <li><strong>新建命令</strong> - 点击右上角"+ 新建命令"按钮</li>
+                        <li><strong>搜索命令</strong> - 使用搜索框或快捷键 Cmd/Ctrl + F</li>
+                        <li><strong>复制命令</strong> - 点击命令卡片上的"复制"按钮</li>
+                        <li><strong>收藏命令</strong> - 点击❤️图标添加到收藏</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <h4 style="margin-bottom: 8px; color: #374151;">⌨️ 快捷键</h4>
+                    <ul style="color: #6b7280; line-height: 1.6; margin-left: 16px;">
+                        <li><strong>Cmd/Ctrl + N</strong> - 新建命令</li>
+                        <li><strong>Cmd/Ctrl + F</strong> - 聚焦搜索框</li>
+                        <li><strong>Esc</strong> - 关闭模态框</li>
+                        <li><strong>Cmd/Ctrl + 1-5</strong> - 快速切换分类</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <h4 style="margin-bottom: 8px; color: #374151;">📊 分类管理</h4>
+                    <ul style="color: #6b7280; line-height: 1.6; margin-left: 16px;">
+                        <li>在侧边栏底部点击"新建分类"</li>
+                        <li>为分类选择颜色以便区分</li>
+                        <li>使用分类筛选命令</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <h4 style="margin-bottom: 8px; color: #374151;">📁 数据管理</h4>
+                    <ul style="color: #6b7280; line-height: 1.6; margin-left: 16px;">
+                        <li><strong>导出数据</strong> - 备份所有命令和分类</li>
+                        <li><strong>导入数据</strong> - 从JSON文件恢复数据</li>
+                        <li>数据自动保存在本地数据库中</li>
+                    </ul>
+                </div>
+
+                <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                    <h4 style="margin-bottom: 8px; color: #111827;">💡 小贴士</h4>
+                    <p style="color: #6b7280; line-height: 1.6; margin: 0;">
+                        使用描述和标签让命令更容易找到。定期导出数据以防意外丢失。
+                    </p>
                 </div>
             </div>
         </div>
@@ -909,6 +985,16 @@
         // 隐藏分类模态框
         function hideCategoryModal() {
             document.getElementById('categoryModal').classList.remove('show');
+        }
+
+        // 显示帮助模态框
+        function showHelpModal() {
+            document.getElementById('helpModal').classList.add('show');
+        }
+
+        // 隐藏帮助模态框
+        function hideHelpModal() {
+            document.getElementById('helpModal').classList.remove('show');
         }
 
         // 显示添加模态框

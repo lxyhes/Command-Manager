@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Menu, Tray, globalShortcut, ipcMain, shell } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
 
 // 导入后端服务器
@@ -8,6 +9,7 @@ const createServer = require('./server/app');
 // 导入新功能模块
 const WindowDetector = require('./window-detector');
 const FloatingPanel = require('./floating-panel');
+const ContextAnalyzer = require('./context-analyzer');
 
 let mainWindow;
 let tray;
@@ -202,11 +204,22 @@ function initializeSmartFeatures() {
   // 创建悬浮面板
   floatingPanel = new FloatingPanel();
 
+  // 创建上下文分析器
+  contextAnalyzer = new ContextAnalyzer();
+
   // 监听终端激活事件
   windowDetector.on('terminalActivated', async (window) => {
-    console.log(`🎯 终端激活: ${window.owner.name}`);
-    // 可以在这里添加自动显示逻辑
-    // 暂时不自动显示，避免打扰用户
+    console.log(`🎯 终端激活: ${window.owner.name} - ${window.title}`);
+    
+    // 分析当前终端上下文
+    const context = await contextAnalyzer.analyzeTerminalContext(window);
+    console.log('📊 终端上下文分析:', context);
+    
+    // 缓存当前上下文用于智能推荐
+    currentTerminalContext = context;
+    
+    // 自动刷新命令缓存（基于上下文）
+    await refreshCommandsCacheWithContext(context);
   });
 
   windowDetector.on('terminalDeactivated', (window) => {
@@ -215,12 +228,23 @@ function initializeSmartFeatures() {
     if (floatingPanel.isVisible) {
       floatingPanel.hide();
     }
+    // 清空上下文缓存
+    currentTerminalContext = null;
+  });
+
+  // 监听窗口标题变化（用于实时上下文更新）
+  windowDetector.on('windowTitleChanged', async (window) => {
+    if (windowDetector.isTerminalActive) {
+      const context = await contextAnalyzer.analyzeTerminalContext(window);
+      currentTerminalContext = context;
+      console.log('🔄 窗口标题更新，重新分析上下文:', context);
+    }
   });
 
   // 开始监控
   windowDetector.startMonitoring();
 
-  console.log('🚀 智能功能已初始化');
+  console.log('🚀 智能功能已初始化（增强版）');
 }
 
 // 加载命令数据
@@ -228,8 +252,17 @@ async function loadCommands() {
   try {
     const response = await fetch('http://localhost:9091/api/commands');
     if (response.ok) {
-      commandsCache = await response.json();
-      console.log(`📚 已加载 ${commandsCache.length} 个命令`);
+      const result = await response.json();
+      if (result.success) {
+        commandsCache = result.data;
+        console.log(`📚 已加载 ${commandsCache.length} 个命令`);
+      } else {
+        console.error('❌ API返回失败:', result.error);
+        commandsCache = [];
+      }
+    } else {
+      console.error('❌ HTTP请求失败:', response.status);
+      commandsCache = [];
     }
   } catch (error) {
     console.error('❌ 加载命令失败:', error.message);
@@ -243,12 +276,63 @@ async function refreshCommandsCache() {
   console.log('🔄 命令缓存已刷新');
 }
 
+// 基于上下文刷新命令缓存
+async function refreshCommandsCacheWithContext(context) {
+  if (context && context.commandType) {
+    console.log(`🎯 基于上下文刷新命令: ${context.commandType}`);
+    // 这里可以根据上下文类型进行智能过滤或排序
+    await refreshCommandsCache();
+  } else {
+    await refreshCommandsCache();
+  }
+}
+
+// 读取更新日志
+function readChangelog() {
+  try {
+    const changelogPath = path.join(__dirname, '..', 'CHANGELOG.md');
+    if (fs.existsSync(changelogPath)) {
+      const content = fs.readFileSync(changelogPath, 'utf8');
+      // 提取版本信息和主要更新
+      const versionMatch = content.match(/## v([\d.]+)/);
+      const featuresMatch = content.match(/### ✨ 新增功能\s+([\s\S]*?)(?=###|##|$)/);
+      
+      if (versionMatch && featuresMatch) {
+        return {
+          version: versionMatch[1],
+          features: featuresMatch[1].trim()
+        };
+      }
+    }
+  } catch (error) {
+    console.error('❌ 读取更新日志失败:', error.message);
+  }
+  return null;
+}
+
+// 显示更新日志信息
+function showChangelogInfo() {
+  const changelog = readChangelog();
+  if (changelog) {
+    console.log('📋 系统更新日志:');
+    console.log(`  版本: v${changelog.version}`);
+    console.log('  主要更新:');
+    console.log(changelog.features);
+    console.log('📖 完整更新日志请查看 CHANGELOG.md 文件');
+  } else {
+    console.log('ℹ️ 更新日志文件不存在或格式不正确');
+  }
+}
+
 // 应用准备就绪
 app.whenReady().then(async () => {
   await startServer();
   createWindow();
   createTray();
   createMenu();
+  
+  // 显示更新日志信息
+  showChangelogInfo();
 
   // 初始化智能功能
   initializeSmartFeatures();
@@ -330,6 +414,11 @@ app.on('before-quit', () => {
 // IPC 通信处理
 ipcMain.handle('get-app-version', () => {
   return app.getVersion();
+});
+
+// 获取更新日志信息
+ipcMain.handle('get-changelog', () => {
+  return readChangelog();
 });
 
 ipcMain.handle('show-window', () => {

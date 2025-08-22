@@ -26,7 +26,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeToClipboard: (text) => ipcRenderer.invoke('write-to-clipboard', text),
   
   // 通知
-  showNotification: (title, body) => ipcRenderer.invoke('show-notification', { title, body })
+  showNotification: (title, body) => ipcRenderer.invoke('show-notification', { title, body }),
+  
+  // 命令选择
+  selectCommand: (command) => ipcRenderer.send('command-selected', command)
 });
 
 // 为开发环境暴露一些调试工具

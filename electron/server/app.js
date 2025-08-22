@@ -9,6 +9,7 @@ const fs = require('fs');
 // 导入路由
 const commandRoutes = require('./routes/commands');
 const categoryRoutes = require('./routes/categories');
+const { initializeSmartRoutes } = require('./routes/smart-commands');
 
 function createServer() {
   return new Promise((resolve, reject) => {
@@ -52,6 +53,7 @@ function createServer() {
       // API 路由
       app.use('/api/commands', commandRoutes);
       app.use('/api/categories', categoryRoutes);
+      app.use('/api/smart', initializeSmartRoutes(db));
 
       // 健康检查
       app.get('/api/health', (req, res) => {
@@ -130,6 +132,40 @@ function initDatabase(db, callback) {
     db.run(`CREATE INDEX IF NOT EXISTS idx_commands_category ON commands(category_id)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_commands_favorite ON commands(is_favorite)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_commands_name ON commands(name)`);
+
+    // 创建命令执行历史表（智能功能扩展）
+    db.run(`
+      CREATE TABLE IF NOT EXISTS command_execution_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        command_id INTEGER NOT NULL,
+        session_id TEXT NOT NULL,
+        context_data TEXT NOT NULL,
+        executed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        success BOOLEAN DEFAULT 1,
+        execution_time INTEGER,
+        error_message TEXT,
+        FOREIGN KEY (command_id) REFERENCES commands (id) ON DELETE CASCADE
+      )
+    `);
+
+    // 创建终端会话表（智能功能扩展）
+    db.run(`
+      CREATE TABLE IF NOT EXISTS terminal_sessions (
+        id TEXT PRIMARY KEY,
+        app_name TEXT NOT NULL,
+        window_title TEXT NOT NULL,
+        working_directory TEXT,
+        last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // 创建智能功能相关索引
+    db.run(`CREATE INDEX IF NOT EXISTS idx_history_command ON command_execution_history(command_id)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_history_session ON command_execution_history(session_id)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_history_time ON command_execution_history(executed_at)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_sessions_active ON terminal_sessions(last_active)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_sessions_app ON terminal_sessions(app_name)`);
 
     // 插入默认分类
     const defaultCategories = [

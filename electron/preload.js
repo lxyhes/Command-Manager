@@ -29,7 +29,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showNotification: (title, body) => ipcRenderer.invoke('show-notification', { title, body }),
   
   // 命令选择
-  selectCommand: (command) => ipcRenderer.send('command-selected', command)
+  selectCommand: (command) => ipcRenderer.send('command-selected', command),
+  
+  // 获取更新日志
+  getChangelog: () => ipcRenderer.invoke('get-changelog')
 });
 
 // 为开发环境暴露一些调试工具

@@ -8,9 +8,10 @@
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"wait-on http://localhost:4001 && electron .\"",
     "dev:backend": "cd ../backend && npm run dev",
     "dev:frontend": "cd ../frontend && npm start",
-    "build": "npm run build:frontend && npm run build:backend && electron-builder",
+    "build": "npm run build:icon && npm run build:frontend && npm run build:backend && electron-builder",
     "build:frontend": "cd ../frontend && npm run build",
     "build:backend": "cd ../backend && npm install --production",
+    "build:icon": "node convert-icon.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:mac": "electron-builder --mac",
@@ -52,17 +53,21 @@
       "preload.js",
       "server/**/*",
       "../frontend/build/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "assets/icon.png"
     ],
     "mac": {
       "category": "public.app-category.developer-tools",
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "assets/icon.png"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/icon.png"
     },
     "linux": {
-      "target": "AppImage"
+      "target": "AppImage",
+      "icon": "assets/icon.png"
     },
     "nsis": {
       "oneClick": false,

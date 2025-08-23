@@ -5,55 +5,396 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>命令管理工具</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+    :root {
+        /* 颜色系统 */
+        --color-primary: #3b82f6;
+        --color-primary-hover: #2563eb;
+        --color-primary-active: #1d4ed8;
+        --color-secondary: #6b7280;
+        --color-success: #10b981;
+        --color-warning: #f59e0b;
+        --color-danger: #ef4444;
+        --color-info: #06b6d4;
+        --color-purple: #764ba2;
+        --color-primary-shadow: rgba(59, 130, 246, 0.1);
+        
+        /* 中性色 */
+        --color-white: #ffffff;
+        --color-gray-50: #f9fafb;
+        --color-gray-100: #f3f4f6;
+        --color-gray-200: #e5e7eb;
+        --color-gray-300: #d1d5db;
+        --color-gray-400: #9ca3af;
+        --color-gray-500: #6b7280;
+        --color-gray-600: #4b5563;
+        --color-gray-700: #374151;
+        --color-gray-800: #1f2937;
+        --color-gray-900: #111827;
+        --color-black: #000000;
+        
+        /* 文本颜色 */
+        --text-primary: var(--color-gray-900);
+        --text-secondary: var(--color-gray-600);
+        --text-muted: var(--color-gray-500);
+        --text-inverse: var(--color-white);
+        
+        /* 背景颜色 */
+        --bg-primary: var(--color-white);
+        --bg-secondary: var(--color-gray-50);
+        --bg-muted: var(--color-gray-100);
+        --bg-overlay: rgba(0, 0, 0, 0.5);
+        
+        /* 边框颜色 */
+        --border-primary: var(--color-gray-200);
+        --border-secondary: var(--color-gray-300);
+        --border-muted: var(--color-gray-100);
+        
+        /* 圆角系统 */
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+        --radius-full: 9999px;
+        
+        /* 边框宽度 */
+        --border-width-sm: 1px;
+        --border-width-md: 2px;
+        --border-width-lg: 3px;
+        
+        /* 阴影系统 */
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        
+        /* 尺寸系统 */
+        --size-8: 32px;
+        --sidebar-width: 280px;
+        --modal-max-width: 600px;
+        --vh-60: 60vh;
+        --vh-80: 80vh;
+        --vh-100: 100vh;
+        
+        /* 间距系统 */
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 20px;
+        --space-6: 24px;
+        --space-8: 32px;
+        --space-10: 40px;
+        --space-12: 48px;
+        --space-16: 64px;
+        
+        /* 字体系统 */
+        --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        
+        /* 字体大小 */
+        --text-xs: 12px;
+        --text-sm: 14px;
+        --text-base: 16px;
+        --text-lg: 18px;
+        --text-xl: 20px;
+        --text-2xl: 24px;
+        --text-3xl: 30px;
+        
+        /* 字体粗细 */
+        --font-light: 300;
+        --font-normal: 400;
+        --font-medium: 500;
+        --font-semibold: 600;
+        --font-bold: 700;
+        
+        /* 过渡动画 */
+        --transition-fast: 150ms ease-in-out;
+        --transition-normal: 200ms ease-in-out;
+        --transition-slow: 300ms ease-in-out;
+        
+        /* 层级 */
+        --z-dropdown: 1000;
+        --z-sticky: 1020;
+        --z-fixed: 1030;
+        --z-modal-backdrop: 1040;
+        --z-modal: 1050;
+        --z-popover: 1060;
+        --z-tooltip: 1070;
+        
+        /* 深色主题变量 */
+        --color-scheme: light;
+    }
+    
+    /* 深色主题 */
+    [data-theme="dark"] {
+        --color-scheme: dark;
+        
+        /* 颜色系统 - 深色主题 */
+        --color-primary: #60a5fa;
+        --color-primary-hover: #3b82f6;
+        --color-primary-active: #2563eb;
+        --color-primary-shadow: rgba(96, 165, 250, 0.2);
+        
+        /* 中性色 - 深色主题 */
+        --color-white: #ffffff;
+        --color-gray-50: #f9fafb;
+        --color-gray-100: #f3f4f6;
+        --color-gray-200: #e5e7eb;
+        --color-gray-300: #d1d5db;
+        --color-gray-400: #9ca3af;
+        --color-gray-500: #6b7280;
+        --color-gray-600: #4b5563;
+        --color-gray-700: #374151;
+        --color-gray-800: #1f2937;
+        --color-gray-900: #111827;
+        --color-black: #000000;
+        
+        /* 文本颜色 - 深色主题 */
+        --text-primary: #f3f4f6;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --text-inverse: #1f2937;
+        
+        /* 背景颜色 - 深色主题 */
+        --bg-primary: #1f2937;
+        --bg-secondary: #111827;
+        --bg-muted: #374151;
+        --bg-overlay: rgba(0, 0, 0, 0.7);
+        
+        /* 边框颜色 - 深色主题 */
+        --border-primary: #374151;
+        --border-secondary: #4b5563;
+        --border-muted: #374151;
+        
+        /* 阴影系统 - 深色主题 */
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.7);
+    }
+    
+    /* 主题切换按钮样式 */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 2px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            z-index: var(--z-fixed);
         }
 
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary);
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .theme-toggle:active {
+            transform: translateY(0);
+        }
+
+        .theme-icon {
+            font-size: 18px;
+            transition: transform var(--transition-fast);
+        }
+
+        .theme-toggle:hover .theme-icon {
+            transform: rotate(180deg);
+        }
+
+        .theme-text {
+            white-space: nowrap;
+        }
+
+        /* 深色主题样式覆盖 */
+        [data-theme="dark"] .sidebar,
+        :root:not([data-theme]) .sidebar {
+            background: var(--bg-secondary);
+            border-right-color: var(--border-primary);
+        }
+
+        [data-theme="dark"] .command-card,
+        :root:not([data-theme]) .command-card {
+            background: var(--bg-muted);
+            border-color: var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        [data-theme="dark"] .command-card:hover,
+        :root:not([data-theme]) .command-card:hover {
+            background: var(--bg-secondary);
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        [data-theme="dark"] .search-input,
+        :root:not([data-theme]) .search-input {
+            background: var(--bg-muted);
+            border-color: var(--border-primary);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .search-input:focus,
+        :root:not([data-theme]) .search-input:focus {
+            border-color: var(--color-primary);
+            background: var(--bg-primary);
+        }
+
+        [data-theme="dark"] .category-item,
+        :root:not([data-theme]) .category-item {
+            color: var(--text-secondary);
+        }
+
+        [data-theme="dark"] .category-item:hover,
+        :root:not([data-theme]) .category-item:hover {
+            background: var(--bg-muted);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .category-item.active,
+        :root:not([data-theme]) .category-item.active {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        [data-theme="dark"] .action-button,
+        :root:not([data-theme]) .action-button {
+            background: var(--bg-muted);
+            color: var(--text-secondary);
+            border-color: var(--border-primary);
+        }
+
+        [data-theme="dark"] .action-button:hover,
+        :root:not([data-theme]) .action-button:hover {
+            background: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
+        }
+
+        [data-theme="dark"] .modal-content,
+        :root:not([data-theme]) .modal-content {
+            background: var(--bg-primary);
+            border-color: var(--border-primary);
+        }
+
+        [data-theme="dark"] .modal-header,
+        :root:not([data-theme]) .modal-header {
+            border-bottom-color: var(--border-primary);
+        }
+
+        [data-theme="dark"] .modal-footer,
+        :root:not([data-theme]) .modal-footer {
+            border-top-color: var(--border-primary);
+        }
+
+        [data-theme="dark"] .toast,
+        :root:not([data-theme]) .toast {
+            background: var(--bg-primary);
+            border-color: var(--border-primary);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* 系统主题检测 */
+        @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) {
+            --color-scheme: dark;
+            
+            /* 应用深色主题变量 */
+            --color-primary: #60a5fa;
+            --color-primary-hover: #3b82f6;
+            --color-primary-active: #2563eb;
+            --color-primary-shadow: rgba(96, 165, 250, 0.2);
+            
+            --text-primary: #f3f4f6;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --bg-muted: #374151;
+            
+            --border-primary: #374151;
+            --border-secondary: #4b5563;
+            
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+        }
+    }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f7fa;
-            color: #333;
-            height: 100vh;
+            font-family: var(--font-family-sans);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-muted) 100%);
+            color: var(--text-primary);
+            height: var(--vh-100);
             overflow: hidden;
+            backdrop-filter: blur(20px);
         }
         
         .app {
             display: flex;
-            height: 100vh;
-        }
+            height: var(--vh-100);
 
         .sidebar {
-            width: 280px;
-            background: #fff;
-            border-right: 1px solid #e5e7eb;
+            width: var(--sidebar-width);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
+            box-shadow: var(--shadow-lg);
         }
 
         .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: var(--space-6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
         }
 
         .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 8px;
+            width: var(--size-8);
+            height: var(--size-8);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-purple) 100%);
+            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
+            color: var(--color-white);
+            font-weight: var(--font-bold);
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+            transition: all var(--transition-normal);
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
         }
 
         .search-box {
@@ -62,66 +403,102 @@
 
         .search-input {
             width: 100%;
-            padding: 10px 12px 10px 40px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
+            padding: var(--space-4);
+            border: 2px solid transparent;
+            border-radius: var(--radius-xl);
+            font-size: var(--text-sm);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all var(--transition-normal);
+            color: var(--text-primary);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .search-input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+            border-color: var(--color-primary);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
         }
 
         .search-icon {
             position: absolute;
-            left: 12px;
+            left: var(--space-3);
             top: 50%;
             transform: translateY(-50%);
-            color: #9ca3af;
+            color: var(--color-gray-400);
         }
 
         .categories {
             flex: 1;
-            padding: 20px;
+            padding: var(--space-5);
             overflow-y: auto;
         }
 
         .category-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: background-color 0.2s;
-            margin-bottom: 4px;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+            z-index: -1;
         }
 
         .category-item:hover {
-            background: #f3f4f6;
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateX(4px);
+        }
+
+        .category-item:hover::before {
+            opacity: 1;
         }
 
         .category-item.active {
-            background: #eff6ff;
-            color: #2563eb;
+            background: var(--color-primary);
+            color: var(--color-white);
+            font-weight: var(--font-semibold);
+            transform: translateX(8px);
+        }
+
+        .category-item.active::before {
+            opacity: 1;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
         }
 
         .category-color {
-            width: 12px;
-            height: 12px;
+            width: var(--space-3);
+            height: var(--space-3);
             border-radius: 50%;
         }
 
         .category-count {
             margin-left: auto;
-            background: #f3f4f6;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            color: #6b7280;
+            background: var(--color-gray-100);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-xl);
+            font-size: var(--text-xs);
+            color: var(--color-gray-500);
         }
         .main-content {
             flex: 1;
@@ -131,143 +508,195 @@
         }
 
         .header {
-            padding: 20px 24px;
-            border-bottom: 1px solid #e5e7eb;
-            background: white;
+            padding: var(--space-5) var(--space-6);
+            border-bottom: 1px solid var(--border-primary);
+            background: var(--bg-primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .header-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #111827;
+            font-size: var(--text-2xl);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
         }
 
         .add-button {
-            background: #3b82f6;
-            color: white;
+            background: var(--color-primary);
+            color: var(--color-white);
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
+            padding: var(--space-2) var(--space-5);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color var(--transition-normal);
         }
 
         .add-button:hover {
-            background: #2563eb;
+            background: var(--color-primary-hover);
         }
 
         .commands-container {
             flex: 1;
-            padding: 24px;
+            padding: var(--space-6);
             overflow-y: auto;
-            background: #f9fafb;
+            background: var(--bg-secondary);
         }
 
         .command-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            transition: all 0.2s;
-            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            margin-bottom: var(--space-4);
+            transition: all var(--transition-normal);
+            cursor: default;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
         }
-
-        .command-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    
+            .command-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 50%);
+                opacity: 0;
+                transition: opacity var(--transition-normal);
+                z-index: 1;
+            }
+    
+            .command-card:hover {
+                transform: translateY(-4px) scale(1.02);
+                box-shadow: var(--shadow-xl);
+                background: rgba(255, 255, 255, 0.15);
+                border-color: rgba(59, 130, 246, 0.3);
+            }
+    
+            .command-card:hover::before {
+                opacity: 1;
+            }
+    
+            .command-card:active {
+                transform: translateY(-2px) scale(1.01);
+                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            }
         }
 
         .command-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: var(--space-3);
         }
 
         .command-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 4px;
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+            margin-bottom: var(--space-1);
         }
 
         .command-category {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #6b7280;
+            gap: var(--space-1_5);
+            font-size: var(--text-xs);
+            color: var(--color-gray-500);
         }
 
         .command-actions {
             display: flex;
-            gap: 8px;
+            gap: var(--space-2);
         }
 
         .action-button {
-            padding: 6px 12px;
-            border: 1px solid #d1d5db;
-            background: white;
-            border-radius: 6px;
-            font-size: 12px;
+            padding: var(--space-2);
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--transition-normal);
+            border: none;
+            background: transparent;
+            color: var(--color-gray-500);
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
         }
-
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+            border-radius: var(--radius-md);
+        }
+        
         .action-button:hover {
-            background: #f3f4f6;
+            color: var(--color-primary);
+            background: var(--color-gray-100);
+            transform: scale(1.1);
         }
-
+        
+        .action-button:hover::before {
+            opacity: 1;
+        }
+        
         .action-button.primary {
-            background: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
+            color: var(--color-primary);
         }
-
+        
         .action-button.primary:hover {
-            background: #2563eb;
+            background: var(--color-primary);
+            color: var(--color-white);
+            transform: scale(1.1);
         }
-
+            
         .action-button.favorite {
-            background: #fef2f2;
-            border-color: #fecaca;
-            color: #dc2626;
+            color: var(--color-warning);
         }
-
+            
         .action-button.favorite:hover {
-            background: #fee2e2;
+            background: var(--color-warning);
+            color: var(--color-white);
+            transform: scale(1.1);
         }
 
         .command-code {
-            background: #f3f4f6;
-            padding: 12px;
-            border-radius: 8px;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 14px;
-            color: #374151;
-            margin: 12px 0;
+            background: var(--color-gray-100);
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            font-family: var(--font-family-mono);
+            font-size: var(--text-sm);
+            color: var(--color-gray-700);
+            margin: var(--space-3) 0;
             word-break: break-all;
         }
 
         .command-description {
-            color: #6b7280;
-            font-size: 14px;
+            color: var(--color-gray-500);
+            font-size: var(--text-sm);
             line-height: 1.5;
-            margin-bottom: 12px;
+            margin-bottom: var(--space-3);
         }
 
         .command-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12px;
-            color: #9ca3af;
+            font-size: var(--text-xs);
+            color: var(--color-gray-400);
         }
 
         .modal {
@@ -276,7 +705,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--bg-overlay);
             display: none;
             align-items: center;
             justify-content: center;
@@ -288,12 +717,12 @@
         }
 
         .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
             width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
+            max-width: var(--modal-max-width-sm);
+            max-height: var(--vh-80);
             overflow-y: auto;
         }
 
@@ -301,101 +730,143 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-5);
         }
 
         .modal-title {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
         }
 
         .close-button {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: var(--text-2xl);
             cursor: pointer;
-            color: #9ca3af;
+            color: var(--color-gray-400);
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: var(--space-4);
         }
 
         .form-label {
             display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: #374151;
+            margin-bottom: var(--space-1_5);
+            font-weight: var(--font-medium);
+            color: var(--color-gray-700);
         }
 
         .form-input {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color var(--transition-normal);
         }
 
         .form-input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-shadow);
         }
 
         .form-textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: calc(var(--space-16) * 1.25);
         }
 
         .form-actions {
             display: flex;
-            gap: 12px;
+            gap: var(--space-3);
             justify-content: flex-end;
-            margin-top: 24px;
+            margin-top: var(--space-6);
         }
 
         .button {
-            padding: 10px 20px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
+            padding: var(--space-2) var(--space-5);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--transition-normal);
+            transform: translateY(0);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .button:hover::before {
+            opacity: 1;
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
         }
 
         .button.secondary {
-            background: white;
-            color: #374151;
+            background: var(--color-white);
+            color: var(--color-gray-700);
         }
 
         .button.secondary:hover {
-            background: #f3f4f6;
+            background: var(--color-gray-100);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .button.primary {
-            background: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
         }
 
         .button.primary:hover {
-            background: #2563eb;
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .button.primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .button.primary:hover {
+            background: var(--color-primary-hover);
         }
 
         .toast {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            z-index: 1001;
+            top: var(--space-5);
+            right: var(--space-5);
+            background: var(--color-white);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            box-shadow: var(--shadow-lg);
+            z-index: var(--z-modal);
             transform: translateX(100%);
-            transition: transform 0.3s;
+            transition: transform var(--transition-slow);
         }
 
         .toast.show {
@@ -403,38 +874,38 @@
         }
 
         .toast.success {
-            border-left: 4px solid #10b981;
+            border-left: 4px solid var(--color-success);
         }
 
         .toast.error {
-            border-left: 4px solid #ef4444;
+            border-left: 4px solid var(--color-error);
         }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: #9ca3af;
+            padding: var(--space-15) var(--space-5);
+            color: var(--color-gray-400);
         }
 
         .empty-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+            font-size: var(--text-4xl);
+            margin-bottom: var(--space-4);
         }
 
         .loading {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: var(--space-10);
         }
 
         .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #3b82f6;
+            width: var(--size-8);
+            height: var(--size-8);
+            border: 3px solid var(--color-gray-100);
+            border-top: 3px solid var(--color-primary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin var(--transition-normal) linear infinite;
         }
 
         @keyframes spin {
@@ -443,12 +914,12 @@
         }
 
         .color-option {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: var(--size-8);
+            height: var(--size-8);
+            border-radius: var(--radius-md);
             cursor: pointer;
             border: 2px solid transparent;
-            transition: all 0.2s;
+            transition: all var(--transition-fast);
         }
 
         .color-option:hover {
@@ -456,7 +927,7 @@
         }
 
         .color-option.selected {
-            border-color: #374151;
+            border-color: var(--color-gray-700);
             transform: scale(1.1);
         }
     </style>
@@ -467,10 +938,12 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <div class="logo-icon">⚡</div>
+                    <div class="logo-icon">
+                        <img src="../assets/icon.png" alt="Logo" style="width: var(--size-8); height: var(--size-8); border-radius: var(--radius-md);">
+                    </div>
                     <div>
-                        <div style="font-weight: 600; font-size: 16px;">命令管理</div>
-                        <div style="font-size: 12px; color: #6b7280;">快速命令工具</div>
+                        <div style="font-weight: var(--font-semibold); font-size: var(--text-base);">命令管理</div>
+                        <div style="font-size: var(--text-xs); color: var(--color-gray-500);">快速命令工具</div>
                     </div>
                 </div>
 
@@ -487,9 +960,9 @@
             </div>
 
             <!-- 统计面板 -->
-            <div style="padding: 20px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
-                <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">📊 统计信息</div>
-                <div id="statsPanel" style="font-size: 11px; color: #9ca3af; line-height: 1.4;">
+            <div style="padding: var(--space-5); border-top: 1px solid var(--border-primary); background: var(--color-gray-50);">
+                <div style="font-size: var(--text-xs); color: var(--color-gray-500); margin-bottom: var(--space-2);">📊 统计信息</div>
+                <div id="statsPanel" style="font-size: var(--text-xs); color: var(--color-gray-400); line-height: 1.4;">
                     <div>总命令: <span id="totalCommands">0</span></div>
                     <div>收藏: <span id="favoriteCommands">0</span></div>
                     <div>今日使用: <span id="todayUsage">0</span></div>
@@ -497,19 +970,33 @@
             </div>
 
             <!-- 使用指南按钮 -->
-            <div style="padding: 16px 20px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+            <div style="padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border-primary); background: var(--color-gray-50);">
                 <button onclick="showHelpModal()" style="
                     width: 100%;
-                    padding: 10px;
-                    background: #f3f4f6;
-                    border: 1px solid #d1d5db;
-                    border-radius: 8px;
-                    color: #374151;
-                    font-size: 12px;
+                    padding: var(--space-2);
+                    background: var(--color-gray-100);
+                    border: 1px solid var(--border-secondary);
+                    border-radius: var(--radius-md);
+                    color: var(--color-gray-700);
+                    font-size: var(--text-xs);
                     cursor: pointer;
-                    transition: all 0.2s;
+                    transition: all var(--transition-normal);
+                    margin-bottom: var(--space-2);
                 ">
                     📖 使用指南
+                </button>
+                <button onclick="showChangelogModal()" style="
+                    width: 100%;
+                    padding: var(--space-2);
+                    background: var(--color-gray-100);
+                    border: 1px solid var(--border-secondary);
+                    border-radius: var(--radius-md);
+                    color: var(--color-gray-700);
+                    font-size: var(--text-xs);
+                    cursor: pointer;
+                    transition: all var(--transition-normal);
+                ">
+                    📋 更新日志
                 </button>
             </div>
         </div>
@@ -518,9 +1005,9 @@
         <div class="main-content">
             <div class="header">
                 <h1 class="header-title">命令列表</h1>
-                <div style="display: flex; gap: 12px;">
-                    <button class="add-button" style="background: #10b981;" onclick="exportData()" title="导出数据">📤 导出</button>
-                    <button class="add-button" style="background: #f59e0b;" onclick="document.getElementById('importFile').click()" title="导入数据">📥 导入</button>
+                <div style="display: flex; gap: var(--space-3);">
+                    <button class="add-button" style="background: var(--color-success);" onclick="exportData()" title="导出数据">📤 导出</button>
+                    <button class="add-button" style="background: var(--color-warning);" onclick="document.getElementById('importFile').click()" title="导入数据">📥 导入</button>
                     <button class="add-button" onclick="showAddModal()">+ 新建命令</button>
                 </div>
             </div>
@@ -538,18 +1025,18 @@
 
     <!-- 使用指南模态框 -->
     <div class="modal" id="helpModal">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: var(--modal-max-width);">
             <div class="modal-header">
                 <h2 class="modal-title">📖 使用指南</h2>
                 <button class="close-button" onclick="hideHelpModal()">&times;</button>
             </div>
 
-            <div style="padding: 0 20px 20px; max-height: 60vh; overflow-y: auto;">
-                <h3 style="margin-bottom: 16px; color: #111827;">快速开始</h3>
+            <div style="padding: 0 var(--space-5) var(--space-5); max-height: var(--vh-60); overflow-y: auto;">
+                <h3 style="margin-bottom: var(--space-4); color: var(--color-gray-900);">快速开始</h3>
                 
-                <div style="margin-bottom: 24px;">
-                    <h4 style="margin-bottom: 8px; color: #374151;">🎯 核心功能</h4>
-                    <ul style="color: #6b7280; line-height: 1.6; margin-left: 16px;">
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="margin-bottom: var(--space-2); color: var(--color-gray-700);">🎯 核心功能</h4>
+                    <ul style="color: var(--color-gray-500); line-height: 1.6; margin-left: var(--space-4);">
                         <li><strong>新建命令</strong> - 点击右上角"+ 新建命令"按钮</li>
                         <li><strong>搜索命令</strong> - 使用搜索框或快捷键 Cmd/Ctrl + F</li>
                         <li><strong>复制命令</strong> - 点击命令卡片上的"复制"按钮</li>
@@ -557,9 +1044,9 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 24px;">
-                    <h4 style="margin-bottom: 8px; color: #374151;">⌨️ 快捷键</h4>
-                    <ul style="color: #6b7280; line-height: 1.6; margin-left: 16px;">
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="margin-bottom: var(--space-2); color: var(--color-gray-700);">⌨️ 快捷键</h4>
+                    <ul style="color: var(--color-gray-500); line-height: 1.6; margin-left: var(--space-4);">
                         <li><strong>Cmd/Ctrl + N</strong> - 新建命令</li>
                         <li><strong>Cmd/Ctrl + F</strong> - 聚焦搜索框</li>
                         <li><strong>Esc</strong> - 关闭模态框</li>
@@ -567,27 +1054,27 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 24px;">
-                    <h4 style="margin-bottom: 8px; color: #374151;">📊 分类管理</h4>
-                    <ul style="color: #6b7280; line-height: 1.6; margin-left: 16px;">
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="margin-bottom: var(--space-2); color: var(--color-gray-700);">📊 分类管理</h4>
+                    <ul style="color: var(--color-gray-500); line-height: 1.6; margin-left: var(--space-4);">
                         <li>在侧边栏底部点击"新建分类"</li>
                         <li>为分类选择颜色以便区分</li>
                         <li>使用分类筛选命令</li>
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 24px;">
-                    <h4 style="margin-bottom: 8px; color: #374151;">📁 数据管理</h4>
-                    <ul style="color: #6b7280; line-height: 1.6; margin-left: 16px;">
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="margin-bottom: var(--space-2); color: var(--color-gray-700);">📁 数据管理</h4>
+                    <ul style="color: var(--color-gray-500); line-height: 1.6; margin-left: var(--space-4);">
                         <li><strong>导出数据</strong> - 备份所有命令和分类</li>
                         <li><strong>导入数据</strong> - 从JSON文件恢复数据</li>
                         <li>数据自动保存在本地数据库中</li>
                     </ul>
                 </div>
 
-                <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; border-left: 4px solid #3b82f6;">
-                    <h4 style="margin-bottom: 8px; color: #111827;">💡 小贴士</h4>
-                    <p style="color: #6b7280; line-height: 1.6; margin: 0;">
+                <div style="background: var(--color-gray-100); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-primary);">
+                    <h4 style="margin-bottom: var(--space-2); color: var(--color-gray-900);">💡 小贴士</h4>
+                    <p style="color: var(--color-gray-500); line-height: 1.6; margin: 0;">
                         使用描述和标签让命令更容易找到。定期导出数据以防意外丢失。
                     </p>
                 </div>
@@ -616,17 +1103,17 @@
 
                 <div class="form-group">
                     <label class="form-label">分类颜色</label>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
-                        <div class="color-option" data-color="#3b82f6" style="background: #3b82f6;"></div>
-                        <div class="color-option" data-color="#ef4444" style="background: #ef4444;"></div>
-                        <div class="color-option" data-color="#10b981" style="background: #10b981;"></div>
-                        <div class="color-option" data-color="#f59e0b" style="background: #f59e0b;"></div>
-                        <div class="color-option" data-color="#8b5cf6" style="background: #8b5cf6;"></div>
-                        <div class="color-option" data-color="#ec4899" style="background: #ec4899;"></div>
-                        <div class="color-option" data-color="#06b6d4" style="background: #06b6d4;"></div>
-                        <div class="color-option" data-color="#84cc16" style="background: #84cc16;"></div>
+                    <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2);">
+                        <div class="color-option" data-color="var(--color-primary)" style="background: var(--color-primary);"></div>
+                        <div class="color-option" data-color="var(--color-error)" style="background: var(--color-error);"></div>
+                        <div class="color-option" data-color="var(--color-success)" style="background: var(--color-success);"></div>
+                        <div class="color-option" data-color="var(--color-warning)" style="background: var(--color-warning);"></div>
+                        <div class="color-option" data-color="var(--color-purple)" style="background: var(--color-purple);"></div>
+                        <div class="color-option" data-color="var(--color-pink)" style="background: var(--color-pink);"></div>
+                        <div class="color-option" data-color="var(--color-cyan)" style="background: var(--color-cyan);"></div>
+                        <div class="color-option" data-color="var(--color-lime)" style="background: var(--color-lime);"></div>
                     </div>
-                    <input type="hidden" id="categoryColor" value="#3b82f6">
+                    <input type="hidden" id="categoryColor" value="var(--color-primary)">
                 </div>
 
                 <div class="form-actions">
@@ -634,6 +1121,28 @@
                     <button type="submit" class="button primary">创建分类</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- 更新日志模态框 -->
+    <div class="modal" id="changelogModal">
+        <div class="modal-content" style="max-width: var(--size-xxl); max-height: var(--vh-80);">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 系统更新日志</h2>
+                <button class="close-button" onclick="hideChangelogModal()">&times;</button>
+            </div>
+
+            <div style="padding: 0 var(--space-5) var(--space-5); max-height: var(--vh-60); overflow-y: auto;">
+                <div id="changelogContent" style="font-family: var(--font-family-mono); font-size: var(--text-sm); line-height: 1.5; color: var(--color-gray-700);">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions" style="justify-content: center; margin-top: var(--space-4);">
+                <button class="button secondary" onclick="hideChangelogModal()">关闭</button>
+            </div>
         </div>
     </div>
 
@@ -691,8 +1200,18 @@
         let showFavorites = false;
         let showRecent = false;
 
-        // API 基础URL
-        const API_BASE = 'http://localhost:9091/api';
+        // API 基础URL - 自动检测环境
+const API_BASE = (() => {
+  // 如果是Electron环境，使用localhost:9091
+  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
+    return 'http://localhost:9091/api';
+  }
+  // 如果是Web环境，使用当前域名（开发环境使用localhost:9091）
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:9091/api';
+  }
+  return `${window.location.origin}/api`;
+})();
 
         // 初始化应用
         async function init() {
@@ -758,17 +1277,17 @@
 
             let html = `
                 <div class="category-item ${!currentCategory && !showFavorites && !showRecent ? 'active' : ''}" onclick="selectCategory(null)">
-                    <div class="category-color" style="background: #6b7280;"></div>
+                    <div class="category-color" style="background: var(--color-gray-500);"></div>
                     <span>全部命令</span>
                     <span class="category-count">${commands.length}</span>
                 </div>
                 <div class="category-item ${showRecent ? 'active' : ''}" onclick="toggleRecentFilter()">
-                    <div class="category-color" style="background: #3b82f6;">🕒</div>
+                    <div class="category-color" style="background: var(--color-primary);">🕒</div>
                     <span>最近常用</span>
                     <span class="category-count">${getRecentCommands().length}</span>
                 </div>
                 <div class="category-item ${showFavorites ? 'active' : ''}" onclick="toggleFavoriteFilter()">
-                    <div class="category-color" style="background: #ef4444;">❤️</div>
+                    <div class="category-color" style="background: var(--color-error);">❤️</div>
                     <span>收藏的命令</span>
                     <span class="category-count">${commands.filter(cmd => cmd.is_favorite).length}</span>
                 </div>
@@ -786,9 +1305,9 @@
 
             // 添加创建分类按钮
             html += `
-                <div class="category-item" onclick="showAddCategoryModal()" style="border: 1px dashed #d1d5db; margin-top: 8px;">
-                    <div class="category-color" style="background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af;">+</div>
-                    <span style="color: #6b7280;">新建分类</span>
+                <div class="category-item" onclick="showAddCategoryModal()" style="border: 1px dashed var(--border-secondary); margin-top: var(--space-2);">
+                    <div class="category-color" style="background: var(--color-gray-100); display: flex; align-items: center; justify-content: center; color: var(--color-gray-400);">+</div>
+                    <span style="color: var(--color-gray-500);">新建分类</span>
                 </div>
             `;
 
@@ -973,12 +1492,12 @@
         // 显示添加分类模态框
         function showAddCategoryModal() {
             document.getElementById('categoryForm').reset();
-            document.getElementById('categoryColor').value = '#3b82f6';
+            document.getElementById('categoryColor').value = 'var(--color-primary)';
             // 重置颜色选择
             document.querySelectorAll('.color-option').forEach(option => {
                 option.classList.remove('selected');
             });
-            document.querySelector('.color-option[data-color="#3b82f6"]').classList.add('selected');
+            document.querySelector('.color-option[data-color="var(--color-primary)"]').classList.add('selected');
             document.getElementById('categoryModal').classList.add('show');
         }
 
@@ -1045,6 +1564,59 @@
         // 隐藏模态框
         function hideModal() {
             document.getElementById('commandModal').classList.remove('show');
+        }
+
+        // 显示更新日志模态框
+        async function showChangelogModal() {
+            const modal = document.getElementById('changelogModal');
+            const content = document.getElementById('changelogContent');
+            
+            // 显示加载状态
+            content.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            modal.classList.add('show');
+            
+            try {
+                // 通过Electron API获取更新日志
+                const changelog = await window.electronAPI.getChangelog();
+                
+                if (changelog) {
+                    // 格式化显示更新日志
+                    let html = `<div style="margin-bottom: var(--space-5);">
+                        <div style="font-size: var(--text-base); font-weight: 600; color: var(--color-gray-900); margin-bottom: var(--space-2);">
+                            📦 版本 v${changelog.version}
+                        </div>
+                        <div style="background: var(--color-gray-100); padding: var(--space-4); border-radius: var(--radius-md); border-left: 4px solid var(--color-primary);">
+                            <div style="font-weight: 600; margin-bottom: var(--space-2); color: var(--color-gray-700);">✨ 主要更新：</div>
+                            <div style="white-space: pre-wrap; color: var(--color-gray-500); line-height: 1.6;">${changelog.features}</div>
+                        </div>
+                    </div>`;
+                    
+                    // 添加完整日志链接
+                    html += `<div style="text-align: center; margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--border-primary);">
+                        <div style="font-size: var(--text-xs); color: var(--color-gray-400); margin-bottom: var(--space-2);">
+                            查看完整更新日志请查看 CHANGELOG.md 文件
+                        </div>
+                    </div>`;
+                    
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = '<div style="text-align: center; color: var(--color-gray-400); padding: var(--space-10);">' +
+                    '<div style="font-size: var(--text-4xl); margin-bottom: var(--space-4);">📄</div>' +
+                    '<div>更新日志文件不存在或格式不正确</div>' +
+                '</div>';
+                }
+            } catch (error) {
+                console.error('加载更新日志失败:', error);
+                content.innerHTML = '<div style="text-align: center; color: var(--color-error); padding: var(--space-10);">' +
+                    '<div style="font-size: var(--text-4xl); margin-bottom: var(--space-4);">❌</div>' +
+                    '<div>加载更新日志失败</div>' +
+                '</div>';
+            }
+        }
+
+        // 隐藏更新日志模态框
+        function hideChangelogModal() {
+            document.getElementById('changelogModal').classList.remove('show');
         }
 
         // 保存命令
@@ -1283,6 +1855,119 @@
                 document.getElementById('categoryColor').value = event.target.dataset.color;
             }
         });
+
+        // 主题管理器
+        class ThemeManager {
+            constructor() {
+                this.currentTheme = this.getStoredTheme() || this.getSystemTheme();
+                this.applyTheme(this.currentTheme);
+                this.setupSystemThemeListener();
+            }
+
+            getStoredTheme() {
+                try {
+                    return localStorage.getItem('theme');
+                } catch (error) {
+                    console.warn('无法访问localStorage:', error);
+                    return null;
+                }
+            }
+
+            getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                this.currentTheme = theme;
+                this.dispatchThemeChangeEvent(theme);
+            }
+
+            toggleTheme() {
+                const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+                this.applyTheme(newTheme);
+                this.storeTheme(newTheme);
+            }
+
+            storeTheme(theme) {
+                try {
+                    localStorage.setItem('theme', theme);
+                } catch (error) {
+                    console.warn('无法存储主题到localStorage:', error);
+                }
+            }
+
+            setupSystemThemeListener() {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                mediaQuery.addEventListener('change', (e) => {
+                    if (!this.hasUserOverride()) {
+                        this.applyTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
+            }
+
+            hasUserOverride() {
+                return localStorage.getItem('theme') !== null;
+            }
+
+            dispatchThemeChangeEvent(theme) {
+                const event = new CustomEvent('themechange', {
+                    detail: { theme }
+                });
+                document.dispatchEvent(event);
+            }
+
+            resetToSystemTheme() {
+                localStorage.removeItem('theme');
+                this.applyTheme(this.getSystemTheme());
+            }
+        }
+
+        // 初始化主题管理器
+        const themeManager = new ThemeManager();
+
+        // 主题切换按钮处理
+        function setupThemeToggle() {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'theme-toggle';
+            toggleBtn.innerHTML = `
+                <span class="theme-icon">🌙</span>
+                <span class="theme-text">切换主题</span>
+            `;
+            
+            toggleBtn.addEventListener('click', () => {
+                themeManager.toggleTheme();
+                updateToggleButton();
+            });
+
+            // 添加到页面
+            const header = document.querySelector('.sidebar-header');
+            if (header) {
+                header.appendChild(toggleBtn);
+            }
+
+            updateToggleButton();
+
+            function updateToggleButton() {
+                const icon = toggleBtn.querySelector('.theme-icon');
+                const text = toggleBtn.querySelector('.theme-text');
+                
+                if (themeManager.currentTheme === 'dark') {
+                    icon.textContent = '☀️';
+                    text.textContent = '切换到亮色';
+                } else {
+                    icon.textContent = '🌙';
+                    text.textContent = '切换到深色';
+                }
+            }
+        }
+
+        // 页面加载完成后设置主题切换
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupThemeToggle);
+        } else {
+            setupThemeToggle();
+        }
 
         // 初始化应用
         init();

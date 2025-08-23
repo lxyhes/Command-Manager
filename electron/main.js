@@ -33,7 +33,7 @@ function createWindow() {
     },
     titleBarStyle: 'hiddenInset', // macOS 样式
     show: false, // 先不显示，等加载完成后再显示
-    icon: path.join(__dirname, 'assets/icon.svg') // 应用图标
+    icon: path.join(__dirname, 'assets/icon.png') // 应用图标
   });
 
   // 加载应用
@@ -359,8 +359,8 @@ app.whenReady().then(async () => {
     // 刷新命令缓存
     await refreshCommandsCache();
 
-    // 显示悬浮面板
-    floatingPanel.toggle(commandsCache);
+    // 显示悬浮面板（异步调用）
+    await floatingPanel.toggle(commandsCache);
   });
 
   // 注册智能检测快捷键（仅在终端激活时有效）
@@ -370,7 +370,10 @@ app.whenReady().then(async () => {
     if (terminalStatus.isActive) {
       console.log('🎯 终端智能面板触发');
       await refreshCommandsCache();
-      floatingPanel.show(commandsCache);
+      
+      // 获取当前终端上下文并显示智能推荐面板
+      const context = await contextAnalyzer.analyzeTerminalContext(terminalStatus.window);
+      await floatingPanel.show(commandsCache, context);
     } else {
       console.log('⚠️ 当前不在终端环境，快捷键无效');
     }
@@ -431,11 +434,11 @@ ipcMain.handle('hide-window', () => {
 });
 
 // 悬浮面板相关IPC
-ipcMain.on('command-selected', (event, command) => {
+ipcMain.on('command-selected', async (event, command) => {
   console.log(`📋 用户选择命令: ${command.name}`);
 
   if (floatingPanel) {
-    floatingPanel.selectCommand(command);
+    await floatingPanel.selectCommand(command);
   }
 
   // 更新命令使用统计

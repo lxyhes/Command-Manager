@@ -64,6 +64,14 @@ function createServer() {
         });
       });
 
+      // Web端访问 - 静态文件服务
+      app.use(express.static(path.join(__dirname, '../public')));
+
+      // 处理SPA路由 - 所有未匹配的请求返回index.html
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../public/index.html'));
+      });
+
       // 错误处理中间件
       app.use((err, req, res, next) => {
         console.error('服务器错误:', err);

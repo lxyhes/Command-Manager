@@ -1,61 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 背景渐变 -->
+  <!-- 现代渐变背景 -->
   <defs>
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
     </linearGradient>
     <linearGradient id="terminalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1f2937;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#374151;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
     </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
     <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.3"/>
+      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#000000" flood-opacity="0.4"/>
     </filter>
   </defs>
   
-  <!-- 主背景圆角矩形 -->
-  <rect x="32" y="32" width="448" height="448" rx="96" ry="96" fill="url(#bgGradient)" filter="url(#shadow)"/>
+  <!-- 主背景圆形 -->
+  <circle cx="256" cy="256" r="220" fill="url(#bgGradient)" filter="url(#shadow)"/>
   
-  <!-- 终端窗口背景 -->
-  <rect x="80" y="120" width="352" height="272" rx="16" ry="16" fill="url(#terminalGradient)"/>
+  <!-- 发光效果 -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" filter="url(#glow)"/>
   
-  <!-- 终端窗口顶部栏 -->
-  <rect x="80" y="120" width="352" height="40" rx="16" ry="16" fill="#4b5563"/>
-  <rect x="80" y="144" width="352" height="16" fill="#4b5563"/>
+  <!-- 现代化终端窗口 -->
+  <rect x="128" y="160" width="256" height="192" rx="20" ry="20" fill="url(#terminalGradient)"/>
+  
+  <!-- 窗口顶部栏 -->
+  <rect x="128" y="160" width="256" height="32" rx="20" ry="20" fill="#475569"/>
   
   <!-- 窗口控制按钮 -->
-  <circle cx="104" cy="140" r="6" fill="#ef4444"/>
-  <circle cx="128" cy="140" r="6" fill="#f59e0b"/>
-  <circle cx="152" cy="140" r="6" fill="#10b981"/>
+  <circle cx="148" cy="176" r="6" fill="#ef4444"/>
+  <circle cx="168" cy="176" r="6" fill="#f59e0b"/>
+  <circle cx="188" cy="176" r="6" fill="#10b981"/>
   
-  <!-- 终端文本行 -->
-  <rect x="96" y="180" width="120" height="8" rx="4" fill="#10b981" opacity="0.8"/>
-  <rect x="224" y="180" width="80" height="8" rx="4" fill="#6b7280" opacity="0.6"/>
-  
-  <rect x="96" y="200" width="160" height="8" rx="4" fill="#3b82f6" opacity="0.8"/>
-  <rect x="264" y="200" width="60" height="8" rx="4" fill="#6b7280" opacity="0.6"/>
-  
-  <rect x="96" y="220" width="100" height="8" rx="4" fill="#f59e0b" opacity="0.8"/>
-  <rect x="204" y="220" width="140" height="8" rx="4" fill="#6b7280" opacity="0.6"/>
-  
-  <rect x="96" y="240" width="180" height="8" rx="4" fill="#8b5cf6" opacity="0.8"/>
-  <rect x="284" y="240" width="40" height="8" rx="4" fill="#6b7280" opacity="0.6"/>
-  
-  <!-- 光标 -->
-  <rect x="96" y="260" width="12" height="16" rx="2" fill="#10b981">
-    <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite"/>
-  </rect>
-  
-  <!-- 闪电图标 -->
-  <g transform="translate(200, 320)">
-    <path d="M48 0L16 32H32L0 64L32 32H16L48 0Z" fill="#fbbf24" opacity="0.9"/>
-    <path d="M48 0L16 32H32L0 64L32 32H16L48 0Z" fill="#f59e0b" transform="scale(0.8) translate(6, 6)"/>
+  <!-- 终端内容 -->
+  <g fill="#f8fafc" font-family="'SF Mono', Monaco, 'Cascadia Code', monospace" font-size="14">
+    <!-- 命令提示符 -->
+    <text x="148" y="210" fill="#10b981">$</text>
+    <text x="164" y="210">npm start</text>
+    
+    <!-- 输出内容 -->
+    <text x="148" y="235" fill="#3b82f6">></text>
+    <text x="164" y="235" opacity="0.8">Starting development server...</text>
+    
+    <text x="148" y="260" fill="#f59e0b">></text>
+    <text x="164" y="260" opacity="0.8">Listening on port 3000</text>
+    
+    <text x="148" y="285" fill="#8b5cf6">></text>
+    <text x="164" y="285" opacity="0.8">Ready in 1.2s</text>
   </g>
   
+  <!-- 动态光标 -->
+  <rect x="164" y="305" width="8" height="16" rx="2" fill="#10b981">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+  </rect>
+  
   <!-- 装饰性代码符号 -->
-  <text x="360" y="200" font-family="SF Mono, Monaco, monospace" font-size="24" fill="#10b981" opacity="0.6">$</text>
-  <text x="380" y="240" font-family="SF Mono, Monaco, monospace" font-size="20" fill="#3b82f6" opacity="0.6">></text>
-  <text x="360" y="280" font-family="SF Mono, Monaco, monospace" font-size="18" fill="#f59e0b" opacity="0.6">#</text>
+  <text x="380" y="220" font-family="'SF Mono', Monaco, monospace" font-size="18" fill="rgba(255,255,255,0.3)">{</text>
+  <text x="400" y="250" font-family="'SF Mono', Monaco, monospace" font-size="18" fill="rgba(255,255,255,0.3)">}</text>
+  <text x="360" y="280" font-family="'SF Mono', Monaco, monospace" font-size="16" fill="rgba(255,255,255,0.3)">=></text>
+  
+  <!-- 外圈装饰 -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="5,5"/>
 </svg>

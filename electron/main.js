@@ -29,7 +29,8 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      webSecurity: false // 禁用web安全策略，允许跨域请求
     },
     titleBarStyle: 'hiddenInset', // macOS 样式
     show: false, // 先不显示，等加载完成后再显示
@@ -37,14 +38,26 @@ function createWindow() {
   });
 
   // 加载应用
-  mainWindow.loadFile(path.join(__dirname, 'public/index.html'));
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
+  mainWindow.loadFile(path.join(__dirname, 'public/index.html')).catch(error => {
+    console.error('❌ 加载前端页面失败:', error.message);
+    // 创建错误提示窗口
+    createErrorWindow('加载前端页面失败，请检查public/index.html文件是否存在');
+  });
+  
+  // 始终打开开发者工具以便调试
+  mainWindow.webContents.openDevTools();
+  
+  // 监听页面加载失败事件
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error(`❌ 页面加载失败: ${errorCode} - ${errorDescription} - ${validatedURL}`);
+    createErrorWindow(`页面加载失败: ${errorDescription}`);
+  });
 
   // 窗口准备好后显示
   mainWindow.once('ready-to-show', () => {
+    console.log('✅ 窗口准备就绪，正在显示...');
     mainWindow.show();
+    console.log('✅ 窗口已显示');
   });
 
   // 窗口关闭时隐藏到托盘而不是退出
@@ -60,6 +73,82 @@ function createWindow() {
     shell.openExternal(url);
     return { action: 'deny' };
   });
+}
+
+// 创建错误提示窗口
+function createErrorWindow(errorMessage) {
+  const errorWindow = new BrowserWindow({
+    width: 400,
+    height: 200,
+    parent: mainWindow,
+    modal: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  errorWindow.loadURL(`data:text/html;charset=utf-8,
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+          background: #f8f9fa; 
+          margin: 0; 
+          padding: 20px; 
+          display: flex; 
+          flex-direction: column; 
+          justify-content: center; 
+          height: 100vh; 
+          box-sizing: border-box;
+        }
+        .error-container { 
+          background: white; 
+          padding: 24px; 
+          border-radius: 12px; 
+          box-shadow: 0 4px 20px rgba(0,0,0,0.1); 
+          border-left: 4px solid #ff4757;
+          text-align: center;
+        }
+        .error-icon { 
+          font-size: 32px; 
+          margin-bottom: 16px; 
+          color: #ff4757;
+        }
+        .error-message { 
+          color: #2d3748; 
+          margin-bottom: 20px; 
+          line-height: 1.5;
+          font-size: 14px;
+        }
+        .retry-button { 
+          background: #ff4757; 
+          color: white; 
+          border: none; 
+          padding: 10px 20px; 
+          border-radius: 6px; 
+          cursor: pointer; 
+          font-size: 14px;
+          transition: background 0.2s;
+        }
+        .retry-button:hover { 
+          background: #ff3742; 
+        }
+      </style>
+    </head>
+    <body>
+      <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <div class="error-message">${errorMessage}</div>
+        <button class="retry-button" onclick="window.location.reload()">重新加载</button>
+      </div>
+    </body>
+    </html>
+  `);
 }
 
 // 创建系统托盘 - 暂时禁用

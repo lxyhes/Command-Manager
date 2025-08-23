@@ -112,6 +112,19 @@
         --transition-normal: 200ms ease-in-out;
         --transition-slow: 300ms ease-in-out;
         
+        /* 视觉优化 - 渐变色彩 */
+        --gradient-primary: linear-gradient(135deg, var(--color-primary), var(--color-primary-active));
+        --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
+        --gradient-sidebar: linear-gradient(180deg, var(--color-primary), var(--color-primary-active));
+        
+        /* 视觉优化 - 增强阴影 */
+        --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+        --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        
+        /* 视觉优化 - 缓动函数 */
+        --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --ease-in-out-back: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        
         /* 层级 */
         --z-dropdown: 1000;
         --z-sticky: 1020;
@@ -171,15 +184,18 @@
         --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
         --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
         --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.7);
+        
+        /* 视觉优化 - 深色主题渐变 */
+        --gradient-primary-dark: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+        --gradient-card-dark: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(31, 41, 55, 0.98));
+        --gradient-sidebar-dark: linear-gradient(180deg, var(--color-primary), var(--color-primary-hover));
     }
     
     /* 主题切换按钮样式 */
         .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             padding: 8px 16px;
             border: 2px solid var(--border-primary);
@@ -192,7 +208,8 @@
             transition: all var(--transition-fast);
             backdrop-filter: blur(10px);
             box-shadow: var(--shadow-sm);
-            z-index: var(--z-fixed);
+            margin: var(--space-4) auto;
+            width: fit-content;
         }
 
         .theme-toggle:hover {
@@ -223,13 +240,13 @@
         /* 深色主题样式覆盖 */
         [data-theme="dark"] .sidebar,
         :root:not([data-theme]) .sidebar {
-            background: var(--bg-secondary);
+            background: var(--gradient-sidebar-dark);
             border-right-color: var(--border-primary);
         }
 
         [data-theme="dark"] .command-card,
         :root:not([data-theme]) .command-card {
-            background: var(--bg-muted);
+            background: var(--gradient-card-dark);
             border-color: var(--border-primary);
             box-shadow: var(--shadow-sm);
         }
@@ -309,6 +326,43 @@
             box-shadow: var(--shadow-lg);
         }
 
+        /* 深色主题下统计面板样式 */
+        [data-theme="dark"] .sidebar > div:has(#statsPanel),
+        :root:not([data-theme]) .sidebar > div:has(#statsPanel) {
+            background: var(--color-gray-800) !important;
+            border-top-color: var(--color-gray-700) !important;
+        }
+
+        [data-theme="dark"] .sidebar > div:has(#statsPanel) > div:first-child,
+        :root:not([data-theme]) .sidebar > div:has(#statsPanel) > div:first-child {
+            color: var(--color-gray-300) !important;
+        }
+
+        [data-theme="dark"] #statsPanel,
+        :root:not([data-theme]) #statsPanel {
+            color: var(--color-gray-400) !important;
+        }
+
+        /* 深色主题下使用指南按钮样式 */
+        [data-theme="dark"] .sidebar > div:has(button[onclick="showHelpModal()"]),
+        :root:not([data-theme]) .sidebar > div:has(button[onclick="showHelpModal()"]) {
+            background: var(--color-gray-800) !important;
+            border-top-color: var(--color-gray-700) !important;
+        }
+
+        [data-theme="dark"] .sidebar > div:has(button[onclick="showHelpModal()"]) button,
+        :root:not([data-theme]) .sidebar > div:has(button[onclick="showHelpModal()"]) button {
+            background: var(--color-gray-700) !important;
+            border-color: var(--color-gray-600) !important;
+            color: var(--color-gray-200) !important;
+        }
+
+        [data-theme="dark"] .sidebar > div:has(button[onclick="showHelpModal()"]) button:hover,
+        :root:not([data-theme]) .sidebar > div:has(button[onclick="showHelpModal()"]) button:hover {
+            background: var(--color-gray-600) !important;
+            border-color: var(--color-gray-500) !important;
+        }
+
         /* 系统主题检测 */
         @media (prefers-color-scheme: dark) {
         :root:not([data-theme]) {
@@ -354,6 +408,7 @@
         .app {
             display: flex;
             height: var(--vh-100);
+            animation: appEntrance 0.8s var(--ease-out-back) both;
 
         .sidebar {
             width: var(--sidebar-width);
@@ -369,6 +424,10 @@
             padding: var(--space-6);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+            position: relative;
         }
 
         .logo {
@@ -403,7 +462,7 @@
 
         .search-input {
             width: 100%;
-            padding: var(--space-4);
+            padding: var(--space-4) var(--space-4) var(--space-4) calc(var(--space-4) + var(--space-6));
             border: 2px solid transparent;
             border-radius: var(--radius-xl);
             font-size: var(--text-sm);
@@ -522,6 +581,11 @@
             color: var(--color-gray-900);
         }
 
+        [data-theme="dark"] .header-title,
+        :root:not([data-theme]) .header-title {
+            color: var(--text-primary);
+        }
+
         .add-button {
             background: var(--color-primary);
             color: var(--color-white);
@@ -546,7 +610,7 @@
         }
 
         .command-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--gradient-card);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-xl);
@@ -554,10 +618,11 @@
             margin-bottom: var(--space-4);
             transition: all var(--transition-normal);
             cursor: default;
-            backdrop-filter: blur(10px);
             box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
+            transform-origin: center;
+            animation: cardEntrance 0.6s var(--ease-out-back) both;
         }
     
             .command-card::before {
@@ -574,10 +639,11 @@
             }
     
             .command-card:hover {
-                transform: translateY(-4px) scale(1.02);
-                box-shadow: var(--shadow-xl);
-                background: rgba(255, 255, 255, 0.15);
-                border-color: rgba(59, 130, 246, 0.3);
+                transform: translateY(-6px) scale(1.03);
+                box-shadow: var(--shadow-hover);
+                background: var(--gradient-card);
+                border-color: rgba(59, 130, 246, 0.4);
+                animation: cardHover 0.4s var(--ease-out-back) both;
             }
     
             .command-card:hover::before {
@@ -604,6 +670,11 @@
             margin-bottom: var(--space-1);
         }
 
+        [data-theme="dark"] .command-name,
+        :root:not([data-theme]) .command-name {
+            color: var(--text-primary);
+        }
+
         .command-category {
             display: flex;
             align-items: center;
@@ -628,6 +699,7 @@
             position: relative;
             overflow: hidden;
             z-index: 2;
+            transform-origin: center;
         }
         
         .action-button::before {
@@ -646,7 +718,9 @@
         .action-button:hover {
             color: var(--color-primary);
             background: var(--color-gray-100);
-            transform: scale(1.1);
+            transform: scale(1.15);
+            box-shadow: var(--shadow-sm);
+            animation: buttonPulse 0.6s var(--ease-out-back) both;
         }
         
         .action-button:hover::before {
@@ -658,9 +732,11 @@
         }
         
         .action-button.primary:hover {
-            background: var(--color-primary);
+            background: var(--gradient-primary);
             color: var(--color-white);
-            transform: scale(1.1);
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            animation: buttonPulse 0.6s var(--ease-out-back) both;
         }
             
         .action-button.favorite {
@@ -668,9 +744,11 @@
         }
             
         .action-button.favorite:hover {
-            background: var(--color-warning);
+            background: linear-gradient(135deg, var(--color-warning), #f97316);
             color: var(--color-white);
-            transform: scale(1.1);
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+            animation: buttonPulse 0.6s var(--ease-out-back) both;
         }
 
         .command-code {
@@ -682,6 +760,12 @@
             color: var(--color-gray-700);
             margin: var(--space-3) 0;
             word-break: break-all;
+        }
+
+        [data-theme="dark"] .command-code,
+        :root:not([data-theme]) .command-code {
+            background: var(--bg-muted);
+            color: var(--text-secondary);
         }
 
         .command-description {
@@ -929,6 +1013,50 @@
         .color-option.selected {
             border-color: var(--color-gray-700);
             transform: scale(1.1);
+        }
+
+        /* 视觉优化 - 动画关键帧 */
+        @keyframes cardEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes cardHover {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                transform: translateY(-6px) scale(1.03);
+            }
+        }
+
+        @keyframes buttonPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1.15);
+            }
+        }
+
+        @keyframes appEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
 </head>
@@ -1203,7 +1331,7 @@
         // API 基础URL - 自动检测环境
 const API_BASE = (() => {
   // 如果是Electron环境，使用localhost:9091
-  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
+  if (typeof window !== 'undefined' && window.electronAPI) {
     return 'http://localhost:9091/api';
   }
   // 如果是Web环境，使用当前域名（开发环境使用localhost:9091）
@@ -1940,10 +2068,16 @@ const API_BASE = (() => {
                 updateToggleButton();
             });
 
-            // 添加到页面
-            const header = document.querySelector('.sidebar-header');
-            if (header) {
-                header.appendChild(toggleBtn);
+            // 添加到页面 - 在使用指南按钮上方
+            const helpButtonSection = document.querySelector('.sidebar > div:has(button[onclick="showHelpModal()"])');
+            if (helpButtonSection) {
+                helpButtonSection.parentNode.insertBefore(toggleBtn, helpButtonSection);
+            } else {
+                // 备用方案：添加到侧边栏底部
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    sidebar.appendChild(toggleBtn);
+                }
             }
 
             updateToggleButton();
